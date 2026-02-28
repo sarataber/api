@@ -13,4 +13,8 @@ export class AppController {
   getHealth(): string {
     return this.appService.getHello();
   }
+  @Get("/db-check")
+  getDbCheck(): string {
+    return this.appService.getHello();
+  }
 }
