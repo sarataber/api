@@ -6,12 +6,11 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
-    previewFeatures = ["driverAdapters"]
-
 }
 
 model Document {
