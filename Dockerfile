@@ -1,5 +1,5 @@
 # ---------- Build stage ----------
-FROM node:22-alpine AS build
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -7,24 +7,20 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
-
-RUN npx prisma generate
 RUN npm run build
-
+RUN npx prisma generate
 
 # ---------- Runtime stage ----------
-FROM node:22-alpine
+FROM node:22-alpine as runner
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY package*.json ./
-RUN npm ci --omit=dev
-
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
 
