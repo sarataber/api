@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
@@ -9,7 +9,7 @@ export class DocumentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3Service,
-  ) {}
+  ) { }
 
   async presignUpload(dto: PresignRequestDto) {
     // מחזיר URL + key. client מעלה ל-S3 ישירות.
@@ -46,9 +46,9 @@ export class DocumentsService {
   }
 
   async presignDownload(id: string) {
-    const doc = await this.prisma.document.findUnique({ where: { id } });
+    const doc = await this.prisma.document.findUnique({ where: { id, deletedAt: null } });
     if (!doc || doc.deletedAt) {
-      return null;
+      throw new NotFoundException('Document not found');;
     }
     return this.s3.presignDownload({ key: doc.s3Key });
   }
