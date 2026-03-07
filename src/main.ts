@@ -3,11 +3,12 @@ import 'dotenv/config'
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { CORS_ORIGIN, PORT } from './config/env';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: CORS_ORIGIN || '*',
   });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -15,6 +16,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(PORT ?? 3000);
 }
 bootstrap();
